@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>KYEOL — On-chain Trust Protocol for Verified Work</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <a class="brand" href="./">KYEOL <span>결</span></a>
+    <button id="connect">지갑 연결</button>
+  </header>
+
+  <main>
+    <section class="hero">
+      <p class="eyebrow">BUILT ON GIWA</p>
+      <h1>한국어 작업을 맡기고,<br>완료된 신뢰를 남깁니다.</h1>
+      <p>검증된 한국 로컬라이저와 계약하고, 납품 승인 후 온체인에서 안전하게 지급하세요.</p>
+      <small>An on-chain trust protocol connecting global projects with verified local experts. Korean Web3 localization is the first use case.</small>
+    </section>
+
+    <section class="networkBar" aria-label="배포 정보">
+      <span><b>LIVE</b> GIWA Sepolia</span>
+      <span>Official Testnet Dojang</span>
+      <span>No admin keys · Non-custodial</span>
+      <a href="https://sepolia-explorer.giwa.io/address/0xE75b2A70bc323436A211e117Ba221EE468B208Cc" target="_blank" rel="noreferrer">컨트랙트 확인 ↗</a>
+    </section>
+
+    <div class="grid">
+      <section class="panel">
+        <p class="step">01 / CREATE</p>
+        <h2>번역 계약 만들기</h2>
+        <form id="createForm">
+          <label>한국 로컬라이저 지갑</label>
+          <input id="translator" required placeholder="0x…">
+          <label>작업 명세</label>
+          <textarea id="brief" required placeholder="원문 URL, 분량, 납품 형식과 요구사항"></textarea>
+          <div class="split">
+            <div><label>마감</label><input id="deadline" type="datetime-local" required></div>
+            <div><label>지급액</label><input id="amount" type="number" min="0.0001" step="0.0001" required placeholder="ETH"></div>
+          </div>
+          <button type="submit">자금 예치하고 생성</button>
+        </form>
+      </section>
+
+      <section class="panel">
+        <p class="step">02 / TRACK</p>
+        <h2>계약 확인</h2>
+        <form id="loadForm" class="row">
+          <input id="jobId" type="number" min="0" required placeholder="Job ID">
+          <button class="secondary">불러오기</button>
+        </form>
+
+        <div id="empty" class="empty">Job ID를 입력하면 다음 행동 하나만 표시됩니다.</div>
+        <div id="job" hidden>
+          <div class="jobHead"><span id="state" class="badge"></span><span id="verified" class="verified"></span></div>
+          <dl>
+            <div><dt>의뢰자</dt><dd id="client"></dd></div>
+            <div><dt>로컬라이저</dt><dd><strong id="translatorName"></strong><span id="jobTranslator"></span></dd></div>
+            <div><dt>에스크로</dt><dd id="jobAmount"></dd></div>
+            <div><dt>마감</dt><dd id="jobDeadline"></dd></div>
+            <div><dt>결과물 해시</dt><dd id="deliveryHash"></dd></div>
+          </dl>
+          <div id="notice" class="notice"></div>
+          <div id="actions" class="actions">
+            <button id="accept" hidden>검증하고 수락</button>
+            <button id="refund" class="danger" hidden>환불</button>
+            <form id="submitForm" hidden><input id="delivery" required placeholder="납품 파일 또는 게시 URL"><button>결과물 제출</button></form>
+            <button id="approve" hidden>납품 승인</button>
+            <button id="claim" hidden>리뷰 기간 종료 · 지급 확정</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section class="panel balance">
+      <div><p class="step">SETTLEMENT</p><h2>인출 가능 금액 <span id="credit">—</span></h2></div>
+      <button id="withdraw" class="secondary" disabled>내 지갑으로 인출</button>
+    </section>
+    <p id="status" role="status"></p>
+  </main>
+
+  <script type="module" src="app.js?v=2"></script>
+</body>
+</html>
