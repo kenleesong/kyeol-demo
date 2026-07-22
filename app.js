@@ -36,8 +36,34 @@ const REVERT_KO = {
   NothingToWithdraw: "인출할 금액이 없습니다."
 };
 
-function describeError(error) {
-  const name = error?.revert?.name;
+// 커스텀 에러는 전부 무인자이므로 selector = keccak("Name()")의 앞 4바이트로 정확히 식별된다.
+export const REVERT_SELECTORS = Object.fromEntries(
+  Object.keys(REVERT_KO).map((name) => [id(`${name}()`).slice(0, 10), name])
+);
+
+// 지갑의 eth_estimateGas 실패는 revert 데이터를 error.revert가 아니라 error.info.error.data 같은
+// 중첩 위치에 문자열로 담아 보낸다. 알려진 selector prefix와 일치할 때만 채택한다
+// (현재 앱 ABI와 검증 케이스에서는 오탐을 확인하지 못했다).
+export function findRevertName(value, seen = new Set(), depth = 0) {
+  if (value == null || depth > 6) return undefined;
+  if (typeof value === "string") {
+    for (const hex of value.match(/0x[0-9a-fA-F]{8,}/g) ?? []) {
+      const name = REVERT_SELECTORS[hex.slice(0, 10).toLowerCase()];
+      if (name) return name;
+    }
+    return undefined;
+  }
+  if (typeof value !== "object" || seen.has(value)) return undefined;
+  seen.add(value);
+  for (const nested of Object.values(value)) {
+    const name = findRevertName(nested, seen, depth + 1);
+    if (name) return name;
+  }
+  return undefined;
+}
+
+export function describeError(error) {
+  const name = error?.revert?.name ?? findRevertName(error);
   if (name && REVERT_KO[name]) return `${REVERT_KO[name]} (${name})`;
   return error?.shortMessage ?? error?.reason ?? error?.message ?? String(error);
 }
